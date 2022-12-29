@@ -1,16 +1,43 @@
-# 샘플 Python 스크립트입니다.
+'''
+    Author : Ezen
+    Date : 2022. 12. 29
 
-# Shift+F10을(를) 눌러 실행하거나 내 코드로 바꿉니다.
-# 클래스, 파일, 도구 창, 액션 및 설정을 어디서나 검색하려면 Shift 두 번을(를) 누릅니다.
+'''
+
+'''
+    keras : tenserflow를 활용해서 인공지능으 ㄹ더 쉽게 만들 수 있도록 도와주는 소프트웨어
+            tenserflow의 기본 기능으로 내장됨
+'''
+
+from tensorflow import keras
+import data_reader
 
 
-def print_hi(name):
-    # 스크립트를 디버그하려면 하단 코드 줄의 중단점을 사용합니다.
-    print(f'Hi, {name}')  # 중단점을 전환하려면 Ctrl+F8을(를) 누릅니다.
+EPOCHS = 20  # 전체 데이터셋을 몇회 학습시킬 것이냐, 몇번 반복할 것이냐
+
+# 데이터를 읽어옴
+dr = data_reader.DataReader()
+
+# 인공신경망
+model = keras.Sequential([
+    keras.layers.Dense(3),                              #첫번째 층은 3개의 유닛은 가지고 있으며 한 래이어 구성
+    keras.layers.Dense(128, activation="relu"),          #두번째 층은 128개의 유닛을 가지고 한 레이어 구성, 렐루함수
+    keras.layers.Dense(3, activation="softmax")         #세번째 층은 3개의 유닛을 가지고 있으며 한 레이어 구성
+])
 
 
-# 스크립트를 실행하려면 여백의 녹색 버튼을 누릅니다.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+# 인공신경망 컴파일
+'''
+    model 변수에 저장한 인공신경망을 압축하고
+    메모리 위에 올려서 당장 사용할 수 있게 한다.
+    optimizer : 신경망을 학습시키기 위해 사용하는 알고리즘
+    metrics : 어떤 점수를 기준으로 인공지능의 성능을 채점할 것인지 기준
+    loss : 인공지능의 학습 방향을 결정하는 함수
+'''
+model.compile(optimizer="adam", metrics=["accuracy"],
+              loss="sparse_categorical_crossentropy")
 
-# https://www.jetbrains.com/help/pycharm/에서 PyCharm 도움말 참조
+print("==================================학습 시작============================================")
+# 인공신경망 학습
+model.fit(dr.train_X, dr.train_Y, epochs=EPOCHS,
+          validation_data=(dr.test_X, dr.test_Y))
